@@ -12,6 +12,7 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    restart: always
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
@@ -19,6 +20,7 @@ services:
       - '-config.file=/etc/prometheus/prometheus.yml'
       - '-storage.local.path=/prometheus'
       - '-alertmanager.url=http://alertmanager:9093'
+      - '-storage.local.memory-chunks=250000'
     expose:
       - 9090
     ports:
@@ -37,6 +39,7 @@ services:
   node-exporter:
     container_name: node-exporter
     image: prom/node-exporter
+    restart: always
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -49,6 +52,7 @@ services:
     deploy:
   alertmanager:
     image: prom/alertmanager
+    restart: always
     ports:
       - 9093:9093
     volumes:
@@ -64,6 +68,7 @@ services:
           - node.hostname == <hostname where alertmanager config file in>
   cadvisor:
     image: google/cadvisor
+    restart: always
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -78,6 +83,7 @@ services:
 
   grafana:
     image: grafana/grafana
+    restart: always
     depends_on:
       - prometheus
     ports:
