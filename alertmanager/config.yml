@@ -8,3 +8,11 @@ receivers:
             username: '<username>'
             channel: '#<channel-name>'
             api_url: '<incomming-webhook-url>'
+    - name: 'makipos'
+      email_configs:
+        - to: tranphuong.080@gmail.com
+          from: makipos.server@gmail.com
+          smarthost: smtp.gmail.com:587
+          auth_username: "makipos.server@gmail.com"
+          auth_identity: "makipos.server@gmail.com"
+          auth_password: "mkp!Q@W#E$R%T^Y"

@@ -1,26 +1,26 @@
-version: '3'
+version: '2.3'
 
 volumes:
     prometheus_data: {}
     grafana_data: {}
 
 networks:
-  front-tier:
-  back-tier:
+  monitoring:
 
 services:
   prometheus:
-    image: prom/prometheus
-    container_name: prometheus
+    image: makipos-prometheus
+    build:
+      context: "./prometheus"
+    container_name: makipos-prometheus
     restart: always
     volumes:
-      - ./prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
+      - /media/Programs/Programs_data/prometheus:/prometheus:z
     command:
-      - '-config.file=/etc/prometheus/prometheus.yml'
-      - '-storage.local.path=/prometheus'
-      - '-alertmanager.url=http://alertmanager:9093'
-      - '-storage.local.memory-chunks=250000'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      # - '--storage.local.path=/prometheus'
+      # - '--alertmanager.url=http://alertmanager:9093'
+      # - '--storage.local.memory-chunks=250000'
     expose:
       - 9090
     ports:
@@ -31,43 +31,59 @@ services:
     depends_on:
       - cadvisor
     networks:
-      - back-tier
-    deploy:
-      placement:
-        constraints:
-          - node.hostname == <hostname where the prometheus config file in>
+      - monitoring
+    mem_limit: 512m
+    memswap_limit: 512m
+  grafana:
+    image: grafana/grafana
+    container_name: makipos-grafana
+    restart: always
+    depends_on:
+      - prometheus
+    ports:
+      - 9001:3000
+    volumes:
+      - /media/Programs/Programs_data/grafana:/var/lib/grafana:z
+      # - grafana_data:/var/lib/grafana
+    env_file:
+      - config.monitoring
+    networks:
+      - monitoring
+  alertmanager:
+    image: makipos-alertmanager
+    build:
+      context: "./alertmanager"
+    container_name: makipos-alertmanager
+    restart: always
+    ports:
+      - 9093:9093
+    networks:
+      - monitoring
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+
   node-exporter:
-    container_name: node-exporter
+    container_name: makipos-node-exporter
     image: prom/node-exporter
     restart: always
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    command: '-collector.procfs=/host/proc -collector.sysfs=/host/sys -collector.filesystem.ignored-mount-points="^(/rootfs|/host|)/(sys|proc|dev|host|etc)($$|/)" collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^(/rootfs|/host|)/(sys|proc|dev|host|etc)($$|/)"'
+      - '--collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
     expose:
       - 9100
     networks:
-      - back-tier
-    deploy:
-  alertmanager:
-    image: prom/alertmanager
-    restart: always
-    ports:
-      - 9093:9093
-    volumes:
-      - ./alertmanager/:/etc/alertmanager/
-    networks:
-      - back-tier
-    command:
-      - '-config.file=/etc/alertmanager/config.yml'
-      - '-storage.path=/alertmanager'
-    deploy:
-      placement:
-        constraints:
-          - node.hostname == <hostname where alertmanager config file in>
+      - monitoring
+
   cadvisor:
     image: google/cadvisor
+    container_name: makipos-cadvisor
     restart: always
     volumes:
       - /:/rootfs:ro
@@ -77,21 +93,4 @@ services:
     expose:
       - 8080
     networks:
-      - back-tier
-    deploy:
-      mode: global
-
-  grafana:
-    image: grafana/grafana
-    restart: always
-    depends_on:
-      - prometheus
-    ports:
-      - 9001:3000
-    volumes:
-      - grafana_data:/var/lib/grafana
-    env_file:
-      - config.monitoring
-    networks:
-      - back-tier
-      - front-tier
+      - monitoring
