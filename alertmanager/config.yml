@@ -5,6 +5,15 @@ receivers:
     - name: 'slack'
       slack_configs:
           - send_resolved: true
-            username: '<username>'
-            channel: '#<channel-name>'
-            api_url: '<incomming-webhook-url>'
+            username: 'makipos-server'
+            channel: '#monitor'
+            api_url: 'https://hooks.slack.com/services/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'
+    - name: 'email'
+      email_configs:
+          - send_resolved: true
+            to: 'phuongtq@makipos.com'
+            from: 'makipos-server@makipos.com'
+            smarthost: 'mail.makipos.com'
+            auth_username: 'makipos-server@makipos.com'
+            auth_password: 'MKP!Q@W#E$R%T^Y'
+            require_tls: true
