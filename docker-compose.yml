@@ -13,6 +13,8 @@ services:
     container_name: makipos-jaeger
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    volumes:
+      - /etc/localtime:/etc/localtime:ro    
     ports:
       - 5775:5775/udp
       - 6831:6831/udp
@@ -29,6 +31,7 @@ services:
     volumes:
       # - /media/Programs/Programs_data/prometheus:/prometheus:rw
       - prometheus_data:/prometheus
+      - /etc/localtime:/etc/localtime:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -60,6 +63,8 @@ services:
       - '9093'
     ports:
       - 9093:9093
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - monitoring
     restart: always
@@ -83,6 +88,7 @@ services:
     volumes:
       # - /media/Programs/Programs_data/grafana:/var/lib/grafana:rw
       - grafana_data:/var/lib/grafana
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - ./grafana/config.monitoring
     networks:
@@ -96,6 +102,7 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - /etc/localtime:/etc/localtime:ro
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
@@ -118,6 +125,7 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /etc/localtime:/etc/localtime:ro
     expose:
       - '8080'
     ports:
