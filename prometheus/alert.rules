@@ -5,7 +5,7 @@ groups:
   # Alert for any instance that is unreachable for >5 minutes.
   - alert: service_down
     expr: up == 0
-    for: 2m
+    for: 1m
     labels:
       severity: page
     annotations:
@@ -14,7 +14,7 @@ groups:
 
   - alert: high_load
     expr: node_load1 > 11
-    for: 2m
+    for: 1m
     labels:
       severity: page
     annotations:
