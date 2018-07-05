@@ -14,7 +14,7 @@ services:
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     volumes:
-      - /etc/localtime:/etc/localtime:ro    
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - 5775:5775/udp
       - 6831:6831/udp
@@ -39,8 +39,6 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     expose:
       - '9090'
-    ports:
-      - 9090:9090
     links:
       - cadvisor:cadvisor
       - alertmanager:alertmanager
@@ -110,8 +108,6 @@ services:
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     expose:
       - '9100'
-    ports:
-      - 9100:9100
     networks:
       - monitoring
     restart: always
@@ -128,8 +124,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     expose:
       - '8080'
-    ports:
-      - 8080:8080
     networks:
       - monitoring
     restart: always
