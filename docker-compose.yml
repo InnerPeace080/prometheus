@@ -23,6 +23,9 @@ services:
       - 16686:16686
       - 14268:14268
       - 9411:9411
+    networks:
+      - monitoring
+    restart: always
   prometheus:
     image: makipos-prometheus
     build:
